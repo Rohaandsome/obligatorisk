@@ -1,64 +1,67 @@
 let billetter = []
 function regBillett(){
+    $("#errorFilm").html(" ");
+    $("#errorSeter").html(" ");
+    $("#errorFornavn").html(" ");
+    $("#errorEtternavn").html(" ");
+    $("#errorMail").html(" ");
+    $("#errorTlf").html(" ");
 
-    let feilData = false;
 
-    let enBillett = {
-        film: $("#film").val(),
-        seter: $("#seter").val(),
-        fornavn: $("#fornavn").val(),
-        etternavn: $("#etternavn").val(),
-        mail: $("#mail").val(),
-        tlf: $("#tlf").val(),
-        sjekkMail: /^[\w\.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/,
+    const filmVerdi = $("#film").val();
+    const seterVerdi = $("#seter").val();
+    const fornavnVerdi = $("#fornavn").val();
+    const etternavnVerdi = $("#etternavn").val();
+    const mailVerdi = $("#mail").val();
+    const sjekkMail = /^[\w\.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+    const tlfVerdi = $("#tlf").val();
+
+
+    if (filmVerdi === "") {
+        $("#errorFilm").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, VELG FILM! </span>");
+        return;
     }
-
-    if (enBillett.film === "") {
-        $("#errorFilm").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, VELG FILM! </span>");
-        feilData = true;
+    if (isNaN(seterVerdi) || !Number.isInteger(Number(seterVerdi)) || Number(seterVerdi) <=  0) {
+        $("#errorSeter").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV ANTALL SETER! </span>");
+        return;
+    }
+    if (fornavnVerdi.trim() === "" || /^\d+$/.test(fornavnVerdi)) {
+        $("#errorFornavn").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV FORNAVNET DITT! </span>");
+        return;
+    }
+    if (etternavnVerdi.trim() === "" || /^\d+$/.test(etternavnVerdi)) {
+        $("#errorEtternavn").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV ETTERNAVNET DITT! </span>");
+        return;
+    }
+    if (!sjekkMail.test(mailVerdi)) {
+        $("#errorMail").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV MAILEN DIN! </span>");
+        return;
+    }
+    if (isNaN(tlfVerdi || !Number.isFinite(tlfVerdi))){
+        $("#errorTlf").html("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV NUMMERET DITT!</span>");
         return;
     }
 
-    if (isNaN(enBillett.seter) || !Number.isInteger(Number(enBillett.seter)) || Number(enBillett.seter) <=  0) {
-        $("#errorSeter").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV ANTALL SETER! </span>");
-        feilData = true;
-        return;
-    }
-    if (enBillett.fornavn.trim() === "" || /^\d+$/.test(enBillett.fornavn)) {
-        $("#errorFornavn").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV FORNAVNET DITT! </span>");
-        feilData = true;
-        return;
-    }
-    if (enBillett.etternavn.trim() === "" || /^\d+$/.test(enBillett)) {
-        $("#errorEtternavn").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV ETTERNAVNET DITT! </span>");
-        feilData = true;
-        return;
-    }
-    if (!enBillett.sjekkMail.test(enBillett.mail)) {
-        $("#errorMail").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV MAILEN DIN! </span>");
-        feilData = true;
-        return;
-    }
-    if (!validerTlf(enBillett.tlf)) {
-        $("#errorTlf").textContent("<span style='color:red; font-weight:bold;'> UGYLDIG INPUT, SKRIV NUMMERET DITT!</span>");
-        feilData = true;
-        return;
+
+    const billett = {
+        film : filmVerdi,
+        seter : seterVerdi,
+        fornavn : fornavnVerdi,
+        etternavn : etternavnVerdi,
+        mail : mailVerdi,
+        tlf : tlfVerdi,
     }
 
-    if (!feilData){
-        billetter.push(enBillett);
-        $("#film").val("");
-        $("#seter").val("");
-        $("#fornavn").val("");
-        $("#etternavn").val("");
-        $("#mail").val("");
-        $("#tlf").val("");
-        formaterData(enBillett);
+    $.post("/lagre", billett, function (){
+        hentAlle();
+    });
 
-        $.post("/lagre", billetter, function (data){
-            hentAlle();
-        });
-    }
+    $("#film").val("");
+    $("#seter").val("");
+    $("#fornavn").val("");
+    $("#etternavn").val("");
+    $("#mail").val("");
+    $("#tlf").val("");
 }
 
 function hentAlle(){
@@ -72,9 +75,9 @@ function formaterData(billetter) {
         "<table class ='table table-striped'><tr>" +
         "<th>Film</th><th>Seter</th><th>Fornavn</th><th>Etternavn</th><th>Mail</th><th>Telefonnummer</th>" +
         "</tr>";
-    for (const enBillett of billetter){
+    for (const billett of billetter){
         ut+="<tr>";
-        ut+="<td>"+enBillett.film+"</td><td>"+enBillett.seter+"</td><td>"+enBillett.fornavn+"</td><td>"+enBillett.etternavn+"</td><td>"+enBillett.mail+"</td><td>"+enBillett.tlf+"</td>";
+        ut+="<td>"+billett.film+"</td><td>"+billett.seter+"</td><td>"+billett.fornavn+"</td><td>"+billett.etternavn+"</td><td>"+billett.mail+"</td><td>"+billett.tlf+"</td>";
         ut+="</tr>";
     }
     ut += "</table";
@@ -85,7 +88,7 @@ function slettAlle() {
     $.ajax({
         url: "/slettAlle",
         type: "DELETE",
-        success: function() {
+        success: function () {
             $("#billetter").html("");
             $("#film").val("");
             $("#seter").val("");
@@ -95,10 +98,4 @@ function slettAlle() {
             $("#tlf").val("");
         }
     });
-}
-function validerTlf(input_str) {
-    // This regex allows for various phone number formats, including optional country code, area code, and optional spaces or dashes.
-    var re = /^(1[ -]?)?\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-
-    return re.test(input_str);
 }
