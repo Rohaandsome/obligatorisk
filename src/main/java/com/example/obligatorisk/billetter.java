@@ -1,6 +1,7 @@
 package com.example.obligatorisk;
 
 public class billetter {
+    private int id;
     private String film;
     private String seter;
     private String fornavn;
@@ -8,7 +9,8 @@ public class billetter {
     private String mail;
     private String tlf;
 
-    public billetter(String film, String seter, String fornavn, String etternavn, String mail, String tlf) {
+    public billetter(int id, String film, String seter, String fornavn, String etternavn, String mail, String tlf) {
+        this.id = id;
         this.film = film;
         this.seter = seter;
         this.fornavn = fornavn;
@@ -18,6 +20,14 @@ public class billetter {
     }
 
     public billetter () {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public String getFilm() {

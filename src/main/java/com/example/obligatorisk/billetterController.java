@@ -16,11 +16,23 @@ public class billetterController {
     @PostMapping("/lagre")
     public void lagre(billetter billett){ rep.lagreBilletter(billett);}
 
+    @GetMapping("/hentEiBilet")
+    public billetter hentEiBilet(int id){
+        return rep.hentEiBilet(id);
+    }
     @GetMapping("/hentAlle")
     public List<billetter> hentAlle() {
         return rep.hentAlleBilletter();
     }
 
+    @PostMapping("/endreEiBilet")
+    public void endreEiBilet(billetter billett){
+        rep.endreEiBilet(billett);
+    }
+    @GetMapping("/slettEiBilet")
+    public void slettEiBilet(int id){
+        rep.slettEiBilet(id);
+    }
     @DeleteMapping("/slettAlle")
     public void slettAlle() {
         rep.slettAlleBilletter();
